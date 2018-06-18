@@ -262,6 +262,10 @@ def process_class(data):
 
     return lines
 
+def _output_sep():
+    ''' output separator '''
+    return '-'*40 + '\n'
+
 def _get_marker(prot):
     ''' get the marker for protection level '''
     if prot == 'public':
@@ -276,26 +280,79 @@ def _get_marker(prot):
         # treat others as private
         return '-'
 
-def _print_sep():
-    ''' print separator '''
-    print('-'*40)
+def _output_line(e):
+    ''' output a method / member in format '''
+    return _get_marker(e['prot']) + e['name'] + ': ' + e['type'] + '\n'
 
-def print_class(class_, lines):
-    ''' print class in nice format '''
-    _print_sep()
-    print(class_)
-    _print_sep()
+def output_class(class_, lines):
+    ''' output class in nice format '''
+    s = _output_sep()
+    s += class_ + '\n'
+    s += _output_sep()
     for e in lines:
         if e['role'] == 'member':
-            print(_get_marker(e['prot']) + e['name'] + ': ' + e['type'])
-    _print_sep()
+            s += _output_line(e)
+    s += _output_sep()
     for e in lines:
         if e['role'] == 'method':
-            print(_get_marker(e['prot']) + e['name'] + ': ' + e['type'])
-    _print_sep()
+            s += _output_line(e)
+    s += _output_sep()
+
+    return s
+
+def get_html(data, output):
+    template = '''
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+input[type=submit],
+body {
+  font-family: "Liberation Mono";
+  font-size: 12pt;
+}
+footer {
+  position: fixed;
+  bottom: 10px;
+  right: 30px;
+}
+.adjuster {
+  display: flex;
+  justify-content: center;
+}
+.horizontal {
+  display: inline-block;
+  padding: 10px;
+}
+</style>
+</head>
+<body>
+<div class="adjuster">
+<div class="horizontal">
+<form method="POST" action="/timlyrics/hppuml/">
+<p>
+<span> Input: paste C++ class header here to </span>
+<span> <input type="submit" value="convert"/> </span>
+</p>
+<textarea name="data" cols="80" rows="40">{{data}}</textarea>
+</form>
+</div>
+<div class="horizontal">
+<p> Output: UML styled text </p>
+<textarea name="data" cols="80" rows="40">{{output}}</textarea>
+</div>
+</div>
+<footer>
+<a href="https://github.com/timlyrics/hppuml">github:timlyrics/hppuml</a>
+</footer>
+</body>
+</html>
+'''
+    return template.replace('{{data}}', data).replace('{{output}}', output)
 
 def run(data):
     ''' entry point for overall process '''
+    source_data = data
     data = clean_chars(data)
     data = remove_comments(data)
     data = clean_format(data)
@@ -304,15 +361,19 @@ def run(data):
     scopes = remove_noise(scopes)
 
     classes = class_collapse(scopes)
+    output = ''
     for class_ in classes:
         data = classes[class_]
         data = remove_class_noise(data)
         lines = process_class(data)
-        print_class(class_, lines)
+        output += output_class(class_, lines)
+
+    return get_html(source_data, output)
 
 if __name__ == '__main__':
 
+    data = 'class A { public: int foo(); int bar; }'
     if 'data' in Hook['params']:
-        run(data)
-    else:
-        print('bad data')
+        data = Hook['params']['data']
+
+    print(run(data))
