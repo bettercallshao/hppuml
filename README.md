@@ -1,7 +1,7 @@
 # HppUml
 Help flip C++ header text to be used in UML class diagrams.
 
-https://hook.io/timlyrics/hppuml/
+https://hook.io/bettercallshao/hppuml/
 
 ![HppUml Demo](https://i.imgur.com/TA1axUO.gif "HppUml Demo")
 

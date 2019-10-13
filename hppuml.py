@@ -329,7 +329,7 @@ footer {
 <body>
 <div class="adjuster">
 <div class="horizontal">
-<form method="POST" action="/timlyrics/hppuml/">
+<form method="POST" action="/bettercallshao/hppuml/">
 <p>
 <span> Input: paste C++ class header here to </span>
 <span> <input type="submit" value="convert"/> </span>
@@ -343,7 +343,7 @@ footer {
 </div>
 </div>
 <footer>
-<a href="https://github.com/timlyrics/hppuml">github:timlyrics/hppuml</a>
+<a href="https://github.com/bettercallshao/hppuml">github:bettercallshao/hppuml</a>
 </footer>
 </body>
 </html>
